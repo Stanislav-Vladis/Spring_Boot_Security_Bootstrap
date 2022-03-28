@@ -14,59 +14,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /*WebSecurityConfig - настройка секьюрности по определенным URL, а также настройка UserDetails и GrantedAuthority*/
-@Configuration
-@EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final SuccessUserHandler successUserHandler;
-
-    public WebSecurityConfig(SuccessUserHandler successUserHandler) {
-        this.successUserHandler = successUserHandler;
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/", "/index").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().successHandler(successUserHandler)
-                .permitAll()
-                .and()
-                .logout()
-                .permitAll();
-    }
-
-    // аутентификация inMemory
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.withDefaultPasswordEncoder()
-                        .username("user")
-                        .password("user")
-                        .roles("USER")
-                        .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-/*
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -85,29 +37,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                    .antMatchers("/", "/index").permitAll()
-                    .antMatchers("/admin", "/admin/**").hasRole("ADMIN")
-                    .antMatchers("/user", "/user/**").hasRole("USER")
-                    .antMatchers(HttpMethod.GET, "admin", "/admin/**").hasRole("ADMIN")
-                    .antMatchers(HttpMethod.POST, "admin", "/admin/**").hasRole("ADMIN")
-                    .antMatchers(HttpMethod.PATCH, "admin", "/admin/**").hasRole("ADMIN")
-                    .antMatchers(HttpMethod.DELETE, "admin", "/admin/**").hasRole("ADMIN")
-                    .anyRequest().authenticated()
+                .antMatchers("/", "/index").permitAll()
+                .antMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                .antMatchers("/user", "/user/**").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "admin", "/admin/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "admin", "/admin/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PATCH, "admin", "/admin/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "admin", "/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 .and()
-                    .formLogin().successHandler(successUserHandler)
-                    .permitAll()
+                .formLogin().successHandler(successUserHandler)
+                .permitAll()
                 .and()
-                    .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true)
-                    .deleteCookies("JSESSIONID")
-                    .logoutSuccessUrl("/login")
-                    .permitAll();
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessUrl("/login")
+                .permitAll();
     }
 
-    */
-/*Материалы которые помогли:
+
+
+
+    /*Материалы которые помогли:
     https://highload.today/spring-security/
     https://www.youtube.com/watch?v=7uxROJ1nduk
     https://medium.com/@ashifm4/protection-from-cross-site-request-forgery-csrf-9cf4f542e268
@@ -116,7 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     https://habr.com/ru/post/482552/
     https://www.youtube.com/watch?v=iivY8B5A0Tk
     https://bcrypt-generator.com/
-     *//*
+     */
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
@@ -136,15 +90,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    */
-/*Материалы которые помогли:
+    /*Материалы которые помогли:
     https://www.youtube.com/watch?v=WDlifgLS8iQ
     https://m.youtube.com/watch?v=IjLqJKJxNzg
     https://zametkinapolyah.ru/zametki-o-mysql/chast-12-14-obedinenie-tablic-v-sql-i-bazax-dannyx-sqlite-join-i-select.html
-    *//*
-
     */
-/*@Override
+
+    /*@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
@@ -152,6 +104,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .usersByUsernameQuery("SELECT username, password, enabled FROM users WHERE username = ?")
                 //Из таблицы users и присоединенной к ней таблице users_roles, соединенные через поля id и user_id, выбираем поля username и roles
                 .authoritiesByUsernameQuery("SELECT a.username, b.role FROM users a INNER JOIN roles b INNER JOIN users_roles c ON a.id = c.user_id AND b.id = c.roles_id WHERE a.username = ?");
-    }*//*
+    }*/
 
-}*/
+}
