@@ -3,7 +3,6 @@ package academy.kata.platform.spring.spring_boot_security_bootstrap.service;
 import academy.kata.platform.spring.spring_boot_security_bootstrap.model.Role;
 
 import java.util.List;
-import java.util.Set;
 
 public interface RoleService {
 
