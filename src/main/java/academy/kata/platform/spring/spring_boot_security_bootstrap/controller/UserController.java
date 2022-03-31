@@ -37,30 +37,20 @@ public class UserController {
 
         model.addAttribute("user", new User());
         model.addAttribute("authenticationUser", userService.findUserByUsername(authentication.getName()));
-        model.addAttribute("checkAdminRole", false);
 
         return "show";
 
     }
 
     @GetMapping("/admin")
-    public String allUsers(ModelMap model) {
+    public String authAdmin(ModelMap model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Set<Role> authRoles = userService.findUserByUsername(authentication.getName()).getRoles();
         List<User> users = userService.getAllUsers();
         List<Role> roles = roleService.getAllRoles();
 
-        boolean[] checkAdminRole = {false};
-        authRoles.stream().forEach(role -> {
-            if (role.getRole().equals("ROLE_ADMIN") && checkAdminRole[0] == false) {
-                checkAdminRole[0] = true;
-            }
-        });
-
         model.addAttribute("user", new User());
         model.addAttribute("authenticationUser", userService.findUserByUsername(authentication.getName()));
-        model.addAttribute("checkAdminRole", checkAdminRole[0]);
         model.addAttribute("listUsers", users);
         model.addAttribute("listRoles", roles);
 
@@ -88,12 +78,14 @@ public class UserController {
     public String updateUser(@ModelAttribute("userAttribute") User user,
                              @RequestParam(value="userTypeRoles", required = false) Set<Role> roles) {
 
-        user.setAccountNonExpired(true);
-        user.setAccountNonLocked(true);
-        user.setCredentialsNonExpired(true);
-        user.setEnabled(true);
+        User userBd = userService.findUserById(user.getId());
+
+        user.setAccountNonExpired(userBd.isAccountNonExpired());
+        user.setAccountNonLocked(userBd.isAccountNonLocked());
+        user.setCredentialsNonExpired(userBd.isCredentialsNonExpired());
+        user.setEnabled(userBd.isEnabled());
         if (user.getPassword().equals("")) {
-            user.setPassword(userService.findUserById(user.getId()).getPassword());
+            user.setPassword(userBd.getPassword());
         } else {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         }

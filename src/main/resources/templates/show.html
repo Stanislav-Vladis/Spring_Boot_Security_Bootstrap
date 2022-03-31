@@ -6,7 +6,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap -->
+    <link href="../static/css/bootstrap.css" th:href="@{/css/bootstrap.css}" rel="stylesheet"/>
+    <!-- jQuery -->
+    <script src="../static/js/jquery.js" th:src="@{/js/jquery.js}"></script>
+    <!-- Bootstrap JS -->
+    <script src="../static/js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
     <title>Spring Boot Security Bootstrap</title>
 </head>
 
@@ -46,8 +51,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                     <!-- Информация в левой стороне -->
-                    <ul sec:authorize="isAnonymous()" class="navbar-nav mr-auto"></ul>
-                    <ul sec:authorize="isAuthenticated()" class="navbar-nav mr-auto">
+                    <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
                             <span class="text-white"><h5><b th:text="${authenticationUser.getEmail()}">admin@mail.ru</b></h5></span>
                         </li>
@@ -104,12 +108,12 @@
 
                     <div class="col-3 bg-white pl-0 pr-0 pt-4">
 
-                        <div sec:authorize="isAuthenticated()" th:if="${checkAdminRole} == true" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <div sec:authorize="hasAuthority('ROLE_ADMIN')" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                             <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Admin</a>
                             <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">User</a>
                         </div>
 
-                        <div sec:authorize="isAuthenticated()" th:if="${checkAdminRole} == false" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <div sec:authorize="hasAuthority('ROLE_ADMIN') != true && hasAuthority('ROLE_USER') == true" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                             <a class="nav-link active" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">User</a>
                         </div>
 
@@ -119,7 +123,7 @@
                         <div class="tab-content" id="v-pills-tabContent">
 
                             <!---------------------- ТЕЛО РАЗДЕЛА ЛЕВОГО МЕНЮ №1 ---------------------->
-                            <div sec:authorize="isAuthenticated()" th:if="${checkAdminRole} == true" class="tab-pane fade show active pl-2 pr-4" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                            <div sec:authorize="hasAuthority('ROLE_ADMIN')" class="tab-pane fade show active pl-2 pr-4" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
 
                                 <!-------------------- КОНТЕНТ РАЗДЕЛА ЛЕВОГО МЕНЮ №1 --------------------->
                                 <div class="card bg-light border-0">
@@ -315,7 +319,12 @@
                             <!------------------------------------------------------------------------->
 
                             <!---------------------- ТЕЛО РАЗДЕЛА ЛЕВОГО МЕНЮ №2 ---------------------->
-                            <div sec:authorize="isAuthenticated()" th:class="${checkAdminRole} == false ? 'tab-pane fade show active pl-2 pr-4' : 'tab-pane fade pl-2 pr-4'" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            <th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
+                                <div class="tab-pane fade pl-2 pr-4" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            </th:block>
+                            <th:block sec:authorize="hasAuthority('ROLE_ADMIN') != true && hasAuthority('ROLE_USER') == true">
+                                <div class="tab-pane fade show active pl-2 pr-4" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            </th:block>
 
                                 <!-------------------- КОНТЕНТ РАЗДЕЛА ЛЕВОГО МЕНЮ №2 --------------------->
                                 <div class="card bg-light border-0">
@@ -458,6 +467,7 @@
 
 
 <!---------------------------- МОДАЛЬНЫЕ ОКНА ----------------------------->
+<th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
 <!-- Окно редактирования -->
 <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -618,6 +628,7 @@
         </div>
     </div>
 </div>
+</th:block>
 <!------------------------------------------------------------------------->
 
 
@@ -628,22 +639,17 @@
 
 
 <!------------------------------ JS SCRIPT -------------------------------->
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<!-- AJAX -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<!-- Bootstrap JS -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-
 <script>
-
     //https://itchief.ru/examples/lab.php?topic=bootstrap&file=b4-tabs-3
     //Перемещение по вкладкам списков
     $('button[data-to]').click(function () {
         $(selector).tab('show');
     });
+</script>
 
+
+
+<script sec:authorize="hasAuthority('ROLE_ADMIN')">
     //Получение значений таблицы для редактирования и удаления
     function getTds(tds, operation) {
         let values = [];
@@ -703,7 +709,7 @@
     });
 
     //https://codernote.ru/jquery/sobytiya-jquery/submit/
-    //Отправка формы даления User
+    //Отправка формы удаления User
     $('#buttonDeleteUser').click(function() {
         $('#deleteUser').submit();
     });
